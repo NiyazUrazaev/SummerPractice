@@ -2,6 +2,8 @@
 
 from django.db import models
 
+from practice.models import Practice
+
 
 class BaseUser(models.Model):
 
@@ -35,6 +37,12 @@ class Student(BaseUser):
     group = models.CharField(
         max_length=10,
         default='',
+    )
+
+    practices = models.ManyToManyField(
+        Practice,
+        null=True,
+        blank=True,
     )
 
 
