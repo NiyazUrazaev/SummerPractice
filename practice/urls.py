@@ -1,8 +1,9 @@
 from django.urls import path
 
-from user.views import *
+from practice.views import *
 
 urlpatterns = [
-    # path('users', User.as_view()),
+    path('diary', DiaryView.as_view()),
+    path('day', DayView.as_view()),
 
 ]
