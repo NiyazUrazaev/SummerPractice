@@ -1,7 +1,6 @@
-from django.db import models
 import datetime
 
-# Create your models here.
+from django.db import models
 
 
 class DiaryDay(models.Model):
@@ -29,6 +28,12 @@ class Practice(models.Model):
     TYPE = (
         (STUDY, 'Учебная'),
         (WORK, 'Производственная'),
+    )
+
+    teacher = models.ForeignKey(
+        'user.Teacher',
+        on_delete=models.CASCADE,
+        null=True,
     )
 
     practice_type = models.CharField(

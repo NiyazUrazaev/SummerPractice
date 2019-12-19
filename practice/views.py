@@ -5,7 +5,9 @@ import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Diary, DiaryDay
+from practice.diary_docx.api import DocxDiary
+from user.models import Student
+from .models import Diary, DiaryDay, Practice
 
 
 class DiaryView(APIView):
@@ -23,12 +25,32 @@ class DiaryView(APIView):
             model_entry = {
                 'id': day.id,
                 'date': day.date,
-                # 'work_info': day.work_info,
+                'work_info': day.work_info,
             }
             days.append(model_entry)
 
         return Response(status=200, data=days)
 
+    def post(self, request):
+        diary_id = request.POST.get('diary', None)
+        if diary_id is None:
+            return Response(status=400, data='No diary in kwargs!')
+
+        diary = Diary.objects.get(id=diary_id)
+        diary_days = diary.diary_days.all().order_by('date')
+        practice = Practice.objects.get(diary=diary)
+        student = Student.objects.get(practices=practice)
+
+        diary_docx = DocxDiary(
+            student,
+            practice.teacher,
+            practice,
+            diary_days,
+        )
+
+        download_url = diary_docx.create_docx()
+
+        return Response(status=200, data=download_url)
 
 class DayView(APIView):
 
