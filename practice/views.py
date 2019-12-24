@@ -32,6 +32,7 @@ class DiaryView(APIView):
         return Response(status=200, data=days)
 
     def post(self, request):
+        print(request.POST)
         diary_id = request.POST.get('diary', None)
         if diary_id is None:
             return Response(status=400, data='No diary in kwargs!')
@@ -51,6 +52,7 @@ class DiaryView(APIView):
         download_url = diary_docx.create_docx()
 
         return Response(status=200, data=download_url)
+
 
 class DayView(APIView):
 
@@ -93,11 +95,11 @@ class DayView(APIView):
                 work_info=work_info
             )
 
-        return Response(
-            status=200,
-            data={
-                'message': 'Save new day is succes!',
-                'id': day.id,
-                'date': day.date,
-                'work_info': day.work_info,
-            })
+            return Response(
+                status=200,
+                data={
+                    'message': 'Save new day is succes!',
+                    'id': day.id,
+                    'date': day.date,
+                    'work_info': day.work_info,
+                })
