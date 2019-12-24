@@ -1,0 +1,1 @@
+web: gunicorn SummerPractice.wsgi --log-file -
