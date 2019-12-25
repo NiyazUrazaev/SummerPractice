@@ -23,10 +23,10 @@ class BaseUser(models.Model):
     )
 
     def full_name(self):
-        return f"{self.second_name} {self.name} {self.patronymic}"
+        return "{0} {1} {2}".format(self.second_name, self.name, self.patronymic)
 
     def short_name(self):
-        return f"{self.second_name} {self.name[0]}.{self.patronymic[0]}"
+        return "{0} {1}.{2}".format(self.second_name, self.name[0], self.patronymic[0])
 
     class Meta:
         abstract = True
