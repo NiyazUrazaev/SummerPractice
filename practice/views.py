@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.shortcuts import render
-import datetime
+import pandas as pd
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -26,6 +26,7 @@ class DiaryView(APIView):
                 'id': day.id,
                 'date': day.date,
                 'work_info': day.work_info,
+                'is_complete': day.is_complete,
             }
             days.append(model_entry)
 
@@ -34,11 +35,40 @@ class DiaryView(APIView):
     def post(self, request):
         print(request.POST)
         diary_id = request.POST.get('diary', None)
+        # Значит создаем новый
         if diary_id is None:
-            return Response(status=400, data='No diary in kwargs!')
+            practice_id = request.POST.get('practice', None)
+            if practice_id is None:
+                return Response(status=400, data='No practice in kwargs!')
 
+            practice = Practice.objects.get(id=practice_id)
+            daterange = pd.date_range(practice.date_start, practice.date_end)
+            diary = Diary.objects.create()
+            days = []
+            for day in daterange:
+                dday = DiaryDay.objects.create(
+                    date=day,
+                    work_info='',
+                    is_complete=False,
+                )
+                diary.diary_days.add(dday)
+
+                model_entry = {
+                    'id': dday.id,
+                    'date': dday.date,
+                    'work_info': dday.work_info,
+                    'is_complete': dday.is_complete,
+                }
+                days.append(model_entry)
+
+            diary.save()
+            practice.diary = diary
+            practice.save()
+            return Response(status=200, data={'diary_id': diary.id, 'days': days})
+
+        # Если пришли сюда - генерим док
         diary = Diary.objects.get(id=diary_id)
-        diary_days = diary.diary_days.all().order_by('date')
+        diary_days = diary.diary_days.filter(is_complete=True).order_by('date')
         practice = Practice.objects.get(diary=diary)
         student = Student.objects.get(practices=practice)
 
@@ -68,38 +98,29 @@ class DayView(APIView):
                 'id': day.id,
                 'date': day.date,
                 'work_info': day.work_info,
+                'is_complete': day.is_complete,
             }
         )
 
     def post(self, request):
         day_id = request.POST.get('day', None)
-        date = request.POST.get('date', None)
-        work_info = request.POST.get('work_info', None)
+        work_info = request.POST.get('work_info', '')
         if day_id is not None:
             day = DiaryDay.objects.get(id=day_id)
-            day.date = datetime.datetime.strptime(date, '%Y%m%d').date()
             day.work_info=work_info
+            if work_info != '':
+                day.is_complete = True
             day.save()
 
             return Response(
                 status=200,
                 data={
-                    'message': 'Edit is succes!',
+                    'message': 'Edit is success!',
                     'id': day.id,
                     'date': day.date,
                     'work_info': day.work_info,
+                    'is_complete': day.is_complete,
                 })
         else:
-            day = DiaryDay.objects.create(
-                date=datetime.datetime.strptime(date, '%Y%m%d').date(),
-                work_info=work_info
-            )
+            return Response(status=400, data='No day in kwargs!')
 
-            return Response(
-                status=200,
-                data={
-                    'message': 'Save new day is succes!',
-                    'id': day.id,
-                    'date': day.date,
-                    'work_info': day.work_info,
-                })

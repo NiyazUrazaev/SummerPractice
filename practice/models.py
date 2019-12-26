@@ -14,10 +14,16 @@ class DiaryDay(models.Model):
         default='',
     )
 
+    is_complete = models.BooleanField(
+        default=False,
+    )
+
 
 class Diary(models.Model):
 
-    diary_days = models.ManyToManyField(DiaryDay)
+    diary_days = models.ManyToManyField(
+        DiaryDay
+    )
 
 
 class Practice(models.Model):
@@ -55,4 +61,9 @@ class Practice(models.Model):
         default=datetime.datetime.today(),
     )
 
-    diary = models.ForeignKey(Diary, on_delete=models.CASCADE)
+    diary = models.ForeignKey(
+        Diary,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
