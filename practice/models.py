@@ -5,6 +5,16 @@ from django.db import models
 
 class DiaryDay(models.Model):
 
+    LIKE = 1
+    DISLIKE = 2
+    NEUTRAL = 3
+
+    EVALUATION = (
+        (LIKE, 'Понравилось'),
+        (DISLIKE, 'Не понравилось'),
+        (NEUTRAL, 'Нейтрально'),
+    )
+
     date = models.DateField(
         default=datetime.datetime.today(),
     )
@@ -16,6 +26,21 @@ class DiaryDay(models.Model):
 
     is_complete = models.BooleanField(
         default=False,
+    )
+
+    liked_things = models.TextField(
+        default='',
+    )
+
+    disliked_things = models.TextField(
+        default='',
+    )
+
+    day_evaluation = models.IntegerField(
+        choices=EVALUATION,
+        verbose_name='Day evaluation',
+        null=True,
+        blank=True,
     )
 
 

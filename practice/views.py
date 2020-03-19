@@ -27,6 +27,9 @@ class DiaryView(APIView):
                 'date': day.date,
                 'work_info': day.work_info,
                 'is_complete': day.is_complete,
+                'liked_things': day.liked_things,
+                'disliked_things': day.disliked_things,
+                'day_evaluation': day.day_evaluation,
             }
             days.append(model_entry)
 
@@ -99,17 +102,30 @@ class DayView(APIView):
                 'date': day.date,
                 'work_info': day.work_info,
                 'is_complete': day.is_complete,
+                'liked_things': day.liked_things,
+                'disliked_things': day.disliked_things,
+                'day_evaluation': day.day_evaluation,
             }
         )
 
     def post(self, request):
+
         day_id = request.POST.get('day', None)
         work_info = request.POST.get('work_info', '')
+        liked_things = request.POST.get('liked_things', '')
+        disliked_things = request.POST.get('disliked_things', '')
+        day_evaluation = request.POST.get('day_evaluation', None)
+
         if day_id is not None:
+
+            # TODO: Сделать покрасивее
             day = DiaryDay.objects.get(id=day_id)
             day.work_info=work_info
             if work_info != '':
                 day.is_complete = True
+            day.liked_things=liked_things
+            day.disliked_things=disliked_things
+            day.day_evaluation=day_evaluation
             day.save()
 
             return Response(
@@ -120,7 +136,11 @@ class DayView(APIView):
                     'date': day.date,
                     'work_info': day.work_info,
                     'is_complete': day.is_complete,
-                })
+                    'liked_things': day.liked_things,
+                    'disliked_things': day.disliked_things,
+                    'day_evaluation': day.day_evaluation,
+                }
+            )
         else:
             return Response(status=400, data='No day in kwargs!')
 
