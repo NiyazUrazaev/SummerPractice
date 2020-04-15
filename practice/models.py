@@ -44,13 +44,6 @@ class DiaryDay(models.Model):
     )
 
 
-class Diary(models.Model):
-
-    diary_days = models.ManyToManyField(
-        DiaryDay
-    )
-
-
 class Practice(models.Model):
 
     STUDY = 'Учебная'
@@ -70,7 +63,7 @@ class Practice(models.Model):
     practice_type = models.CharField(
         max_length=30,
         choices=TYPE,
-        verbose_name='Type'
+        verbose_name='Тип практики'
     )
 
     practice_addres = models.CharField(
@@ -86,8 +79,14 @@ class Practice(models.Model):
         default=datetime.datetime.today(),
     )
 
-    diary = models.ForeignKey(
-        Diary,
+
+class Diary(models.Model):
+    diary_days = models.ManyToManyField(
+        DiaryDay
+    )
+
+    practice = models.ForeignKey(
+        Practice,
         on_delete=models.CASCADE,
         null=True,
         blank=True,

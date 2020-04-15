@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render
+from django.forms.models import model_to_dict
 import pandas as pd
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,6 +8,35 @@ from rest_framework.response import Response
 from practice.diary_docx.api import DocxDiary
 from user.models import Student
 from .models import Diary, DiaryDay, Practice
+
+
+class PracticeAllView(APIView):
+
+    # Вывод списка всех практик
+    def get(self, request):
+        practices = [
+            model_to_dict(practice)
+            for practice in Practice.objects.all().select_related(
+                'teacher',)
+        ]
+
+        return Response(status=200, data=practices)
+
+
+class PracticeView(APIView):
+
+    # Получалка инфы о практике
+    def get(self, request):
+        practice_id = request.GET.get('id', None)
+        if practice_id is None:
+            return Response(status=400, data='No id in kwargs!')
+        practice = Practice.objects.get(id=practice_id)
+
+        return Response(status=200, data=model_to_dict(practice))
+
+    # Студент оставляет отзыв практике
+    def post(self, request):
+        pass
 
 
 class DiaryView(APIView):
@@ -64,15 +93,15 @@ class DiaryView(APIView):
                 }
                 days.append(model_entry)
 
+            diary.practice = practice
             diary.save()
-            practice.diary = diary
             practice.save()
             return Response(status=200, data={'diary_id': diary.id, 'days': days})
 
         # Если пришли сюда - генерим док
         diary = Diary.objects.get(id=diary_id)
         diary_days = diary.diary_days.filter(is_complete=True).order_by('date')
-        practice = Practice.objects.get(diary=diary)
+        practice = diary.practice
         student = Student.objects.get(practices=practice)
 
         diary_docx = DocxDiary(
