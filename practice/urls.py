@@ -7,4 +7,5 @@ urlpatterns = [
     path('day', DayView.as_view()),
     path('all', PracticeAllView.as_view()),
     path('', PracticeView.as_view()),
+    path('review', PracticeReviewView.as_view()),
 ]

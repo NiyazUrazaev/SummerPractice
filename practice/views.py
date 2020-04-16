@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from practice.diary_docx.api import DocxDiary
-from user.models import Student
+from user.models import Student, StudentPractice
 from .models import Diary, DiaryDay, Practice
 
 
@@ -34,9 +34,26 @@ class PracticeView(APIView):
 
         return Response(status=200, data=model_to_dict(practice))
 
+
+class PracticeReviewView(APIView):
+
+    # Получаем все отзывы по практике
+    def get(self, request):
+        practice_id = request.GET.get('id', None)
+        if practice_id is None:
+            return Response(status=400, data='No id in kwargs!')
+        reviews = StudentPractice.objects.filter(
+            practice__id=practice_id).values_list('student__id', 'review')
+
+        return Response(status=200, data=reviews)
+
     # Студент оставляет отзыв практике
     def post(self, request):
-        pass
+        practice_id = request.POST.get('id', None)
+        if practice_id is None:
+            return Response(status=400, data='No id in kwargs!')
+        # TODO доделать после авторизации
+        student = request.user
 
 
 class DiaryView(APIView):

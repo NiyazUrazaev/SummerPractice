@@ -39,6 +39,32 @@ class Student(BaseUser):
         null=True,
         blank=True,
         verbose_name='Наборы практик',
+        through='StudentPractice',
+    )
+
+
+class StudentPractice(models.Model):
+
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        verbose_name='Студент',
+    )
+
+    practice = models.ForeignKey(
+        Practice,
+        on_delete=models.CASCADE,
+        verbose_name='Практика',
+    )
+
+    review = models.TextField(
+        default='',
+        verbose_name='Отзыв о практике',
+    )
+
+    aim = models.TextField(
+        default='',
+        verbose_name='Цель на практику',
     )
 
 
