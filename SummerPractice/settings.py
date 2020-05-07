@@ -33,6 +33,8 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'user',
     'practice',
+    'gamification',
+    'mindfulness',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
