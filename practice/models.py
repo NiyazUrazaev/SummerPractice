@@ -3,7 +3,27 @@ import datetime
 from django.db import models
 
 
-class DiaryDay(models.Model):
+class BaseDiaryDay(models.Model):
+    """Базовый класс для одного дня у всех аппов"""
+
+    date = models.DateField(
+        default=datetime.datetime.today(),
+    )
+
+    work_info = models.CharField(
+        max_length=5000,
+        default='',
+    )
+
+    class Meta:
+        abstract = True
+
+
+class BaseAppsDiaryDay(BaseDiaryDay):
+    """
+    Базовый класс для аппов gamification и mindfullness
+    одного дня у дневника
+    """
 
     LIKE = 1
     DISLIKE = 2
@@ -13,15 +33,6 @@ class DiaryDay(models.Model):
         (LIKE, 'Понравилось'),
         (DISLIKE, 'Не понравилось'),
         (NEUTRAL, 'Нейтрально'),
-    )
-
-    date = models.DateField(
-        default=datetime.datetime.today(),
-    )
-
-    work_info = models.CharField(
-        max_length=5000,
-        default='',
     )
 
     is_complete = models.BooleanField(
@@ -43,8 +54,12 @@ class DiaryDay(models.Model):
         blank=True,
     )
 
+    class Meta:
+        abstract = True
 
-class Practice(models.Model):
+
+class BasePractice(models.Model):
+    """Базовы класс для практик всех аппов"""
 
     STUDY = 'Учебная'
     WORK = 'Производственная'
@@ -79,15 +94,43 @@ class Practice(models.Model):
         default=datetime.datetime.today(),
     )
 
+    class Meta:
+        abstract = True
 
-class Diary(models.Model):
+
+class ClassicPractice(BasePractice):
+    """Практика без gamification и без mindfullness"""
+
+    class Meta:
+        verbose_name = "Практика без gamification и без mindfullness"
+        verbose_name_plural = "Практики без gamification и без mindfullness"
+
+
+class ClassicDiaryDay(BaseDiaryDay):
+    """День практики в дневнике без gamification и без mindfullness"""
+
+    class Meta:
+        verbose_name = (
+            "День практики в дневнике без gamification и без mindfullness"
+        )
+        verbose_name_plural = (
+            "Дни практики в дневнике без gamification и без mindfullness"
+        )
+
+
+class ClassicDiary(models.Model):
+    """Дневник без gamification и без mindfullness"""
     diary_days = models.ManyToManyField(
-        DiaryDay
+        ClassicDiaryDay
     )
 
     practice = models.ForeignKey(
-        Practice,
+        ClassicPractice,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
     )
+
+    class Meta:
+        verbose_name = "Дневник без gamification и без mindfullness"
+        verbose_name_plural = "Дневники без gamification и без mindfullness"

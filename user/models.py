@@ -2,11 +2,12 @@
 
 from django.db import models
 
-from practice.models import Practice
+from practice.models import ClassicPractice
 from django.contrib.auth.models import User
 
 
 class BaseUser(User):
+    """Базовый класс пользователя для всех аппов"""
 
     patronymic = models.CharField(
         max_length=100,
@@ -26,7 +27,8 @@ class BaseUser(User):
         abstract = True
 
 
-class Student(BaseUser):
+class BaseStudent(BaseUser):
+    """Базовый класс студента для всех аппов"""
 
     group = models.CharField(
         max_length=10,
@@ -34,44 +36,33 @@ class Student(BaseUser):
         verbose_name='Учебная группа',
     )
 
-    practices = models.ManyToManyField(
-        Practice,
-        null=True,
-        blank=True,
-        verbose_name='Наборы практик',
-        through='StudentPractice',
-    )
-
-
-class StudentPractice(models.Model):
-
-    student = models.ForeignKey(
-        Student,
-        on_delete=models.CASCADE,
-        verbose_name='Студент',
-    )
-
-    practice = models.ForeignKey(
-        Practice,
-        on_delete=models.CASCADE,
-        verbose_name='Практика',
-    )
-
-    review = models.TextField(
-        default='',
-        verbose_name='Отзыв о практике',
-    )
-
-    aim = models.TextField(
-        default='',
-        verbose_name='Цель на практику',
-    )
+    class Meta:
+        abstract = True
 
 
 class Teacher(BaseUser):
-
+    """Классический преподаватель"""
     position = models.CharField(
         max_length=200,
         default='',
     )
+
+    class Meta:
+        verbose_name = "Преподаватель"
+        verbose_name_plural = "Преподаватели"
+
+
+class ClassicStudent(BaseStudent):
+    """Студент без осознанности и геймификации"""
+
+    practices = models.ManyToManyField(
+        ClassicPractice,
+        null=True,
+        blank=True,
+        verbose_name='Наборы практик',
+    )
+
+    class Meta:
+        verbose_name = "Студент без осознанности и геймификации"
+        verbose_name_plural = "Студенты без осознанности и геймификации"
 

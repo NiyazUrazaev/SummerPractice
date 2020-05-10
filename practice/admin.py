@@ -3,8 +3,8 @@
 from django.contrib import admin
 
 # Register your models here.
-from practice.models import Practice, Diary, DiaryDay
+from practice.models import ClassicPractice, ClassicDiary, ClassicDiaryDay
 
-admin.site.register(DiaryDay)
-admin.site.register(Diary)
-admin.site.register(Practice)
+admin.site.register(ClassicDiary)
+admin.site.register(ClassicDiaryDay)
+admin.site.register(ClassicPractice)

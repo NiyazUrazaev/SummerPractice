@@ -8,7 +8,8 @@ from SummerPractice.settings import BASE_DIR, MEDIA_ROOT
 class DocxDiary():
 
     def __init__(self, student, teacher, practice, diary_days):
-        self.doc = DocxTemplate(os.path.join(BASE_DIR, "practice/diary_docx/templates/diary_template.docx"))
+        self.doc = DocxTemplate(os.path.join(
+            BASE_DIR, "practice/diary_docx/templates/diary_template.docx"))
         self.context = {}
         self.student = student
         self.teacher = teacher
