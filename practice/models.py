@@ -15,6 +15,10 @@ class BaseDiaryDay(models.Model):
         default='',
     )
 
+    is_complete = models.BooleanField(
+        default=False,
+    )
+
     class Meta:
         abstract = True
 
@@ -33,10 +37,6 @@ class BaseAppsDiaryDay(BaseDiaryDay):
         (LIKE, 'Понравилось'),
         (DISLIKE, 'Не понравилось'),
         (NEUTRAL, 'Нейтрально'),
-    )
-
-    is_complete = models.BooleanField(
-        default=False,
     )
 
     liked_things = models.TextField(

@@ -1,158 +1,87 @@
 # -*- coding: utf-8 -*-
 
-from django.forms.models import model_to_dict
 import pandas as pd
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from practice.diary_docx.api import DocxDiary
-from user.models import Student, StudentPractice
-from .models import Diary, DiaryDay, Practice
+from practice.abstract_views import (
+    AbstractPracticeAllView, AbstractDiaryDaysView,
+    AbstractPracticeView, AbstractPrintDiaryView,
+    AbstractDayView,
+)
+from practice.models import (
+    ClassicPractice, ClassicDiary,
+    ClassicDiaryDay,
+)
+from user.models import ClassicStudent
 
 
-class PracticeAllView(APIView):
-
-    # Вывод списка всех практик
-    def get(self, request):
-        practices = [
-            model_to_dict(practice)
-            for practice in Practice.objects.all().select_related(
-                'teacher',)
-        ]
-
-        return Response(status=200, data=practices)
+class ClassicPracticeAllView(AbstractPracticeAllView):
+    """Вывод списка всех классических практик"""
+    Model = ClassicPractice
 
 
-class PracticeView(APIView):
-
-    # Получалка инфы о практике
-    def get(self, request):
-        practice_id = request.GET.get('id', None)
-        if practice_id is None:
-            return Response(status=400, data='No id in kwargs!')
-        practice = Practice.objects.get(id=practice_id)
-
-        return Response(status=200, data=model_to_dict(practice))
+class ClassicPracticeView(AbstractPracticeView):
+    """Получалка инфы о классической практике"""
+    Model = ClassicPractice
 
 
-class PracticeReviewView(APIView):
+class ClassicGetAllDiaryDaysView(AbstractDiaryDaysView):
+    """Ручка для получения всех классических дней в дневнике"""
+    Model = ClassicDiary
 
-    # Получаем все отзывы по практике
-    def get(self, request):
-        practice_id = request.GET.get('id', None)
-        if practice_id is None:
-            return Response(status=400, data='No id in kwargs!')
-        reviews = StudentPractice.objects.filter(
-            practice__id=practice_id).values_list('student__id', 'review')
 
-        return Response(status=200, data=reviews)
+class ClassicPrintDiaryView(AbstractPrintDiaryView):
+    """Ручка для печати классического дневника"""
+    Model = ClassicDiary
+    StudentModel = ClassicStudent
 
-    # Студент оставляет отзыв практике
+
+class ClassicCreateDiaryView(APIView):
+    """Создание нового классического дневника"""
+
     def post(self, request):
-        practice_id = request.POST.get('id', None)
+
+        practice_id = request.POST.get('practice', None)
         if practice_id is None:
-            return Response(status=400, data='No id in kwargs!')
-        # TODO доделать после авторизации
-        student = request.user
+            return Response(status=400, data='No practice in kwargs!')
 
+        practice = ClassicPractice.objects.get(id=practice_id)
 
-class DiaryView(APIView):
+        if ClassicDiary.objects.filter(practice=practice).exists():
+            return Response(status=400, data='You have created diary yet!')
 
-    def get(self, request):
-        diary_id = request.GET.get('diary', None)
-        if diary_id is None:
-            return Response(status=400, data='No diary in kwargs!')
-
-        diary = Diary.objects.get(id=diary_id)
-        diary_days = diary.diary_days.all().order_by('date')
-
+        daterange = pd.date_range(practice.date_start, practice.date_end)
+        diary = ClassicDiary.objects.create()
         days = []
-        for day in diary_days:
+        for day in daterange:
+            dday = ClassicDiaryDay.objects.create(
+                date=day,
+                work_info='',
+            )
+            diary.diary_days.add(dday)
+
             model_entry = {
-                'id': day.id,
-                'date': day.date,
-                'work_info': day.work_info,
-                'is_complete': day.is_complete,
-                'liked_things': day.liked_things,
-                'disliked_things': day.disliked_things,
-                'day_evaluation': day.day_evaluation,
+                'id': dday.id,
+                'date': dday.date,
+                'work_info': dday.work_info,
+                'is_complete': dday.is_complete,
             }
             days.append(model_entry)
 
-        return Response(status=200, data=days)
-
-    def post(self, request):
-        print(request.POST)
-        diary_id = request.POST.get('diary', None)
-        # Значит создаем новый
-        if diary_id is None:
-            practice_id = request.POST.get('practice', None)
-            if practice_id is None:
-                return Response(status=400, data='No practice in kwargs!')
-
-            practice = Practice.objects.get(id=practice_id)
-            daterange = pd.date_range(practice.date_start, practice.date_end)
-            diary = Diary.objects.create()
-            days = []
-            for day in daterange:
-                dday = DiaryDay.objects.create(
-                    date=day,
-                    work_info='',
-                    is_complete=False,
-                )
-                diary.diary_days.add(dday)
-
-                model_entry = {
-                    'id': dday.id,
-                    'date': dday.date,
-                    'work_info': dday.work_info,
-                    'is_complete': dday.is_complete,
-                }
-                days.append(model_entry)
-
-            diary.practice = practice
-            diary.save()
-            practice.save()
-            return Response(status=200, data={'diary_id': diary.id, 'days': days})
-
-        # Если пришли сюда - генерим док
-        diary = Diary.objects.get(id=diary_id)
-        diary_days = diary.diary_days.filter(is_complete=True).order_by('date')
-        practice = diary.practice
-        student = Student.objects.get(practices=practice)
-
-        diary_docx = DocxDiary(
-            student,
-            practice.teacher,
-            practice,
-            diary_days,
-        )
-
-        download_url = diary_docx.create_docx()
-
-        return Response(status=200, data=download_url)
+        diary.practice = practice
+        diary.save()
+        practice.save()
+        return Response(status=200, data={'diary_id': diary.id, 'days': days})
 
 
-class DayView(APIView):
+class ClassicGetDayView(AbstractDayView):
+    """Получаем инфу об конкретном классическом дне"""
+    Model = ClassicDiaryDay
 
-    def get(self, request):
-        day_id = request.GET.get('day', None)
-        if day_id is None:
-            return Response(status=400, data='No day in kwargs!')
 
-        day = DiaryDay.objects.get(id=day_id)
-
-        return Response(
-            data={
-                'id': day.id,
-                'date': day.date,
-                'work_info': day.work_info,
-                'is_complete': day.is_complete,
-                'liked_things': day.liked_things,
-                'disliked_things': day.disliked_things,
-                'day_evaluation': day.day_evaluation,
-            }
-        )
+class ClassicEditDayView(APIView):
+    """Создаем/редактируем инфу об конкретном классическом дне"""
 
     def post(self, request):
 
@@ -165,13 +94,13 @@ class DayView(APIView):
         if day_id is not None:
 
             # TODO: Сделать покрасивее
-            day = DiaryDay.objects.get(id=day_id)
-            day.work_info=work_info
+            day = ClassicDiaryDay.objects.get(id=day_id)
+            day.work_info = work_info
             if work_info != '':
                 day.is_complete = True
-            day.liked_things=liked_things
-            day.disliked_things=disliked_things
-            day.day_evaluation=day_evaluation
+            day.liked_things = liked_things
+            day.disliked_things = disliked_things
+            day.day_evaluation = day_evaluation
             day.save()
 
             return Response(
@@ -182,11 +111,7 @@ class DayView(APIView):
                     'date': day.date,
                     'work_info': day.work_info,
                     'is_complete': day.is_complete,
-                    'liked_things': day.liked_things,
-                    'disliked_things': day.disliked_things,
-                    'day_evaluation': day.day_evaluation,
                 }
             )
         else:
             return Response(status=400, data='No day in kwargs!')
-
