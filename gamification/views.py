@@ -75,12 +75,12 @@ class GamificationCreateDiaryView(APIView):
         return Response(status=200, data={'diary_id': diary.id, 'days': days})
 
 
-class ClassicGetDayView(AbstractDayView):
+class GamificationGetDayView(AbstractDayView):
     """Получаем инфу об конкретном дне с геймификацией"""
     Model = GamificationDiaryDay
 
 
-class ClassicEditDayView(APIView):
+class GamificationEditDayView(APIView):
     """Создаем/редактируем инфу об конкретном дне с геймификацией"""
 
     def post(self, request):
