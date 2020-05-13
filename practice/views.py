@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pandas as pd
+from django.forms.models import model_to_dict
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -87,9 +88,6 @@ class ClassicEditDayView(APIView):
 
         day_id = request.POST.get('day', None)
         work_info = request.POST.get('work_info', '')
-        liked_things = request.POST.get('liked_things', '')
-        disliked_things = request.POST.get('disliked_things', '')
-        day_evaluation = request.POST.get('day_evaluation', None)
 
         if day_id is not None:
 
@@ -98,20 +96,11 @@ class ClassicEditDayView(APIView):
             day.work_info = work_info
             if work_info != '':
                 day.is_complete = True
-            day.liked_things = liked_things
-            day.disliked_things = disliked_things
-            day.day_evaluation = day_evaluation
             day.save()
 
             return Response(
                 status=200,
-                data={
-                    'message': 'Edit is success!',
-                    'id': day.id,
-                    'date': day.date,
-                    'work_info': day.work_info,
-                    'is_complete': day.is_complete,
-                }
+                data=model_to_dict(day)
             )
         else:
             return Response(status=400, data='No day in kwargs!')
