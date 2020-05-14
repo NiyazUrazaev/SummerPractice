@@ -61,13 +61,7 @@ class GamificationCreateDiaryView(APIView):
             )
             diary.diary_days.add(dday)
 
-            model_entry = {
-                'id': dday.id,
-                'date': dday.date,
-                'work_info': dday.work_info,
-                'is_complete': dday.is_complete,
-            }
-            days.append(model_entry)
+            days.append(model_to_dict(dday))
 
         diary.practice = practice
         diary.save()
