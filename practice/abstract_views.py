@@ -44,11 +44,12 @@ class AbstractPracticeReviewView(APIView, SetModelMixin, ABC):
     # Получаем все отзывы по практике
     def get(self, request):
 
-        practice_id = request.GET.get('id', None)
+        practice_id = request.GET.get('practice_id', None)
         if practice_id is None:
-            return Response(status=400, data='No id in kwargs!')
+            return Response(status=400, data='No practice_id in kwargs!')
         reviews = type(self).Model.objects.filter(
-            practice__id=practice_id).values_list('student__id', 'review')
+            practice__id=practice_id).values(
+                'student__id','student__first_name', 'student__last_name', 'review')
 
         return Response(status=200, data=reviews)
 
@@ -66,9 +67,9 @@ class AbstractDiaryDaysView(APIView, SetModelMixin, ABC):
     """Абстрактная ручка для получения всех дней в дневнике"""
 
     def get(self, request):
-        diary_id = request.GET.get('diary', None)
+        diary_id = request.GET.get('diary_id', None)
         if diary_id is None:
-            return Response(status=400, data='No diary in kwargs!')
+            return Response(status=400, data='No diary_id in kwargs!')
 
         diary = type(self).Model.objects.get(id=diary_id)
         diary_days = diary.diary_days.all().order_by('date')
@@ -86,7 +87,7 @@ class AbstractPrintDiaryView(APIView, SetModelMixin, ABC):
         raise NotImplementedError
 
     def post(self, request):
-        diary_id = request.POST.get('diary', None)
+        diary_id = request.POST.get('diary_id', None)
         if diary_id is None:
             return Response(status=400, data='No diary in kwargs')
 
@@ -112,15 +113,13 @@ class AbstractDayView(APIView, SetModelMixin, ABC):
     """Получаем инфу об конкретном дне"""
 
     def get(self, request):
-        day_id = request.GET.get('day', None)
+        day_id = request.GET.get('day_id', None)
         if day_id is None:
-            return Response(status=400, data='No day in kwargs!')
+            return Response(status=400, data='No day_id in kwargs!')
 
         day = type(self).Model.objects.get(id=day_id)
 
         return Response(
             status=200,
-            data={
-                model_to_dict(day)
-            }
+            data=model_to_dict(day)
         )

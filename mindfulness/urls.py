@@ -3,7 +3,7 @@ from django.urls import path
 from mindfulness.views import *
 
 urlpatterns = [
-    path('diary', MindfulnessGetAllDiaryDaysView.as_view()),
+    path('get_all_days', MindfulnessGetAllDiaryDaysView.as_view()),
     path('get_day', MindfulnessGetDayView.as_view()),
     path('edit_day', MindfulnessEditDayView.as_view()),
     path('all', MindfulnessPracticeAllView.as_view()),

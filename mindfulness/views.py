@@ -43,12 +43,13 @@ class MindfulnessCreateDiaryView(APIView):
 
     def post(self, request):
 
-        practice_id = request.POST.get('practice', None)
+        practice_id = request.POST.get('practice_id', None)
         if practice_id is None:
-            return Response(status=400, data='No practice in kwargs!')
+            return Response(status=400, data='No practice_id in kwargs!')
 
         practice = MindfulnessPractice.objects.get(id=practice_id)
 
+        # Fixme: Неправильно
         if MindfulnessDiary.objects.filter(practice=practice).exists():
             return Response(status=400, data='You have created diary yet!')
 
@@ -80,7 +81,7 @@ class MindfulnessEditDayView(APIView):
 
     def post(self, request):
 
-        day_id = request.POST.get('day', None)
+        day_id = request.POST.get('day_id', None)
         work_info = request.POST.get('work_info', '')
         liked_things = request.POST.get('liked_things', '')
         disliked_things = request.POST.get('disliked_things', '')
@@ -103,7 +104,7 @@ class MindfulnessEditDayView(APIView):
                 data=model_to_dict(day)
             )
         else:
-            return Response(status=400, data='No day in kwargs!')
+            return Response(status=400, data='No day_id in kwargs!')
 
 
 class MindfulnessPracticeReviewView(AbstractPracticeReviewView):

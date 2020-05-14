@@ -3,7 +3,7 @@ from django.urls import path
 from practice.views import *
 
 urlpatterns = [
-    path('diary', ClassicGetAllDiaryDaysView.as_view()),
+    path('get_all_days', ClassicGetAllDiaryDaysView.as_view()),
     path('get_day', ClassicGetDayView.as_view()),
     path('edit_day', ClassicEditDayView.as_view()),
     path('all', ClassicPracticeAllView.as_view()),

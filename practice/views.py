@@ -43,9 +43,9 @@ class ClassicCreateDiaryView(APIView):
 
     def post(self, request):
 
-        practice_id = request.POST.get('practice', None)
+        practice_id = request.POST.get('practice_id', None)
         if practice_id is None:
-            return Response(status=400, data='No practice in kwargs!')
+            return Response(status=400, data='No practice_id in kwargs!')
 
         practice = ClassicPractice.objects.get(id=practice_id)
 
@@ -86,7 +86,7 @@ class ClassicEditDayView(APIView):
 
     def post(self, request):
 
-        day_id = request.POST.get('day', None)
+        day_id = request.POST.get('day_id', None)
         work_info = request.POST.get('work_info', '')
 
         if day_id is not None:
@@ -103,4 +103,4 @@ class ClassicEditDayView(APIView):
                 data=model_to_dict(day)
             )
         else:
-            return Response(status=400, data='No day in kwargs!')
+            return Response(status=400, data='No day_id in kwargs!')
