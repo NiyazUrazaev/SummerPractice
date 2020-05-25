@@ -16,10 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from SummerPractice.settings import INSTALLED_APPS
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),
     path('classic_practice/', include('practice.urls')),
-    path('gamification_practice/', include('gamification.urls')),
-    path('mindfulness_practice/', include('mindfulness.urls')),
 ]
+
+if 'gamification' in INSTALLED_APPS:
+    urlpatterns.append(path('gamification_practice/', include('gamification.urls')))
+if 'mindfulness' in INSTALLED_APPS:
+    urlpatterns.append(path('mindfulness_practice/', include('mindfulness.urls')))
