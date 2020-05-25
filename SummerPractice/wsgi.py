@@ -14,6 +14,5 @@ from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'SummerPractice.settings')
 git.cmd.Git('.').pull()
-print('start wsgi')
 
 application = get_wsgi_application()
