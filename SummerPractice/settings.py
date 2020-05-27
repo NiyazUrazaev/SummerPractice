@@ -110,6 +110,11 @@ REST_FRAMEWORK = {
     'DEFAULT_METADATA_CLASS': 'rest_framework_json_api.metadata.JSONAPIMetadata',
 }
 
+AUTHENTICATION_BACKENDS = [
+    'user.auth_backends.CustomUserModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 WSGI_APPLICATION = 'SummerPractice.wsgi.application'
