@@ -13,12 +13,19 @@ from practice.abstract_views import (
     AbstractPracticeAllView, AbstractDiaryDaysView,
     AbstractPracticeView, AbstractPrintDiaryView,
     AbstractDayView, AbstractPracticeReviewView,
+    AbstractStudentPracticeAllView,
 )
 
 
 class GamificationPracticeAllView(AbstractPracticeAllView):
     """Вывод списка всех практик с геймификацией"""
     Model = GamificationPractice
+
+
+class GamificationStudentPracticeAllView(AbstractStudentPracticeAllView):
+    """Вывод списка всех практик у студента с геймификацией"""
+    Model = GamificationStudentPractice
+    Diary = GamificationDiary
 
 
 class GamificationPracticeView(AbstractPracticeView):
@@ -34,7 +41,6 @@ class GamificationGetAllDiaryDaysView(AbstractDiaryDaysView):
 class GamificationPrintDiaryView(AbstractPrintDiaryView):
     """Ручка для печати дневника с геймификацией"""
     Model = GamificationDiary
-    StudentModel = GamificationStudent
 
 
 class GamificationCreateDiaryView(APIView):

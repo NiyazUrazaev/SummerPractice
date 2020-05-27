@@ -7,6 +7,7 @@ urlpatterns = [
     path('get_day', MindfulnessGetDayView.as_view()),
     path('edit_day', MindfulnessEditDayView.as_view()),
     path('all', MindfulnessPracticeAllView.as_view()),
+    path('student_all', MindfulnessStudentPracticeAllView.as_view()),
     path('', MindfulnessPracticeView.as_view()),
     path('create_diary', MindfulnessCreateDiaryView.as_view()),
     path('print_diary', MindfulnessPrintDiaryView.as_view()),

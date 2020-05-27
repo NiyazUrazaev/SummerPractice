@@ -27,6 +27,27 @@ class AbstractPracticeAllView(APIView, SetModelMixin, ABC):
         return Response(status=200, data=practices)
 
 
+class AbstractStudentPracticeAllView(APIView, SetModelMixin, ABC):
+    """Вывод списка всех практик у студента
+    для gamification и mindfulness
+    """
+
+    @property
+    def Diary(self):
+        raise NotImplementedError
+
+    def get(self, request):
+
+        practices = [
+            {'practice': model_to_dict(gamification_practice.practice),
+                'diary_id': type(self).Diary.objects.get(practice=gamification_practice).id}
+            for gamification_practice in type(self).Model.objects.filter(
+                student=request.user)
+        ]
+
+        return Response(status=200, data=practices)
+
+
 class AbstractPracticeView(APIView, SetModelMixin, ABC):
     """Получалка инфы о практике"""
 
@@ -82,10 +103,6 @@ class AbstractDiaryDaysView(APIView, SetModelMixin, ABC):
 class AbstractPrintDiaryView(APIView, SetModelMixin, ABC):
     """Абстрактная ручка для печати дневника"""
 
-    @property
-    def StudentModel(self):
-        raise NotImplementedError
-
     def post(self, request):
         diary_id = request.POST.get('diary_id', None)
         if diary_id is None:
@@ -94,8 +111,7 @@ class AbstractPrintDiaryView(APIView, SetModelMixin, ABC):
         diary = type(self).Model.objects.get(id=diary_id)
         diary_days = diary.diary_days.filter(is_complete=True).order_by('date')
         practice = diary.practice
-        # FIXME: Возможно неправильно беру студента
-        student = type(self).StudentModel.objects.get(practices=practice)
+        student = request.user
 
         diary_docx = DocxDiary(
             student,

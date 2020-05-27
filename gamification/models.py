@@ -29,7 +29,7 @@ class GamificationDiary(models.Model):
     )
 
     practice = models.ForeignKey(
-        GamificationPractice,
+        'GamificationStudentPractice',
         on_delete=models.CASCADE,
         null=True,
         blank=True,

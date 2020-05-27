@@ -29,7 +29,7 @@ class MindfulnessDiary(models.Model):
     )
 
     practice = models.ForeignKey(
-        MindfulnessPractice,
+        'MindfulnessStudentPractice',
         on_delete=models.CASCADE,
         null=True,
         blank=True,

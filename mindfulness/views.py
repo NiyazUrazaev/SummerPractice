@@ -13,7 +13,7 @@ from mindfulness.models import (
 from practice.abstract_views import (
     AbstractPracticeAllView, AbstractDiaryDaysView,
     AbstractPracticeView, AbstractPrintDiaryView,
-    AbstractDayView, AbstractPracticeReviewView,
+    AbstractDayView, AbstractPracticeReviewView, AbstractStudentPracticeAllView,
 )
 
 
@@ -35,7 +35,12 @@ class MindfulnessGetAllDiaryDaysView(AbstractDiaryDaysView):
 class MindfulnessPrintDiaryView(AbstractPrintDiaryView):
     """Ручка для печати дневника с осознанностью"""
     Model = MindfulnessDiary
-    StudentModel = MindfulnessStudent
+
+
+class MindfulnessStudentPracticeAllView(AbstractStudentPracticeAllView):
+    """Вывод списка всех практик у студента с осознанностью"""
+    Model = MindfulnessStudentPractice
+    Diary = MindfulnessDiary
 
 
 class MindfulnessCreateDiaryView(APIView):

@@ -27,6 +27,21 @@ class ClassicPracticeView(AbstractPracticeView):
     Model = ClassicPractice
 
 
+class ClassicStudentPracticeAllView(APIView):
+    """Вывод списка всех практик у студента
+    для gamification и mindfulness
+    """
+
+    def get(self, request):
+
+        practices = [
+            model_to_dict(practice)
+            for practice in request.user.practices.objects.all()
+        ]
+
+        return Response(status=200, data=practices)
+
+
 class ClassicGetAllDiaryDaysView(AbstractDiaryDaysView):
     """Ручка для получения всех классических дней в дневнике"""
     Model = ClassicDiary
@@ -35,7 +50,6 @@ class ClassicGetAllDiaryDaysView(AbstractDiaryDaysView):
 class ClassicPrintDiaryView(AbstractPrintDiaryView):
     """Ручка для печати классического дневника"""
     Model = ClassicDiary
-    StudentModel = ClassicStudent
 
 
 class ClassicCreateDiaryView(APIView):
